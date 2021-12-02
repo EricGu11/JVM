@@ -22,7 +22,7 @@ notebook: 宋红康-JVM
 
 **按线程数分**（垃圾回收线程数），可以分为`串行垃圾回收器和并行垃圾回收器`。
 
-<img src="https://tvax1.sinaimg.cn/large/006JhGcily1gwrhrwnmb4j30ha0bwdhu.jpg" alt="image-20200713083030867" width="80%" data-width="622" data-height="428">
+<img src="https://tvax1.sinaimg.cn/large/006JhGcily1gwrhrwnmb4j30ha0bwdhu.jpg" alt="image-20200713083030867" width="80%">
 
 串行回收指的是在同一时间段内只允许有一个 CPU 用于执行垃圾回收操作，此时工作线程被暂停，直至垃圾收集工作结束。
 
@@ -36,7 +36,7 @@ notebook: 宋红康-JVM
 - 并发式垃圾回收器与应用程序线程交替工作，`以尽可能减少应用程序的停顿时间`。
 - 独占式垃圾回收器（Stop the world）一旦运行，就停止应用程序中的所有用户线程，直到垃圾回收过程完全结束。
 
-<img src="https://tvax2.sinaimg.cn/large/006JhGcily1gwrhwkiyasj30is09075v.jpg" alt="image-20200713083443486" width="80%" data-width="676" data-height="324">
+<img src="https://tvax2.sinaimg.cn/large/006JhGcily1gwrhwkiyasj30is09075v.jpg" alt="image-20200713083443486" width="80%">
 
 **按碎片处理方式分**，可分为`压缩武垃圾回收器和非压缩式垃圾回收器`。
 
@@ -72,7 +72,7 @@ notebook: 宋红康-JVM
 
 吞吐量优先，意味着在单位时间内，STW 的时间最短：0.2+0.2=0.4
 
-<img src="https://tva3.sinaimg.cn/large/006JhGcily1gwriir6y4lj30ma0510t9.jpg" alt="image-20200713084726176" width="80%" data-width="802" data-height="181">
+<img src="https://tva3.sinaimg.cn/large/006JhGcily1gwriir6y4lj30ma0510t9.jpg" alt="image-20200713084726176" width="80%">
 
 吞吐量关注的是，在一个指定时间内，最大化一个应用的工作量。
 
@@ -89,7 +89,7 @@ notebook: 宋红康-JVM
 
 例如，GC 期间 100 毫秒的暂停时间意味着在这 100 毫秒期间内没有应用程序线程是活动的。暂停时间优先，意味着尽可能让单次 STW 的时间最短：0.1+0.1 + 0.1+ 0.1+ 0.1=0.5
 
-<img src="https://tvax4.sinaimg.cn/large/006JhGcily1gwrik7rz23j30q705dab1.jpg" alt="image-20200713085306400" width="80%" data-width="943" data-height="193">
+<img src="https://tvax4.sinaimg.cn/large/006JhGcily1gwrik7rz23j30q705dab1.jpg" alt="image-20200713085306400" width="80%">
 
 响应能力是指一个程序或者系统对请求是否能够及时响应，比如：
 
@@ -143,11 +143,11 @@ notebook: 宋红康-JVM
 - `并行回收器：ParNew、Parallel Scavenge、Parallel old`
 - `并发回收器：CMS、G1`
 
-<img src="https://tva3.sinaimg.cn/large/006JhGcigy1gws96ibogcj30ld0dv78z.jpg" alt="image-20200713093551365" width="80%" data-width="769" data-height="499">
+<img src="https://tva3.sinaimg.cn/large/006JhGcigy1gws96ibogcj30ld0dv78z.jpg" alt="image-20200713093551365" width="80%">
 
 #### 2.3 7 款经典收集器与垃圾分代之间的关系
 
-<img src="https://tvax2.sinaimg.cn/large/006JhGcigy1gws97k4towj30te07ojty.jpg" alt="image-20200713093757644" width="80%" data-width="1058" data-height="276">
+<img src="https://tvax2.sinaimg.cn/large/006JhGcigy1gws97k4towj30te07ojty.jpg" alt="image-20200713093757644" width="80%">
 
 新生代收集器：Serial、ParNew、Parallel Scavenge；
 
@@ -157,7 +157,7 @@ notebook: 宋红康-JVM
 
 #### 2.3 垃圾收集器的组合关系
 
-<img src="https://tva4.sinaimg.cn/large/006JhGcigy1gws98oulkaj30o80d4jvs.jpg" alt="image-20200713094745366" width="85%" data-width="872" data-height="472">
+<img src="https://tva4.sinaimg.cn/large/006JhGcigy1gws98oulkaj30o80d4jvs.jpg" alt="image-20200713094745366" width="85%">
 
 - 两个收集器间有连线，表明它们可以搭配使用：Serial/Serial old、Serial/CMS、ParNew/Serial old、ParNew/CMS、Parallel Scavenge/Serial old、Parallel Scavenge/Parallel old、G1；
 - 其中 Serial old 作为 CMS 出现"Concurrent Mode Failure"失败的后备预案。
@@ -190,7 +190,7 @@ Serial 收集器`采用复制算法、串行回收和"stop-the-World"机制的�
   - `与新生代的Parallel scavenge配合使用`
   - `作为老年代CMS收集器的后备垃圾收集方案`
 
-<img src="https://tva3.sinaimg.cn/large/006JhGcigy1gwsaf56svbj30tl094die.jpg" alt="image-20200713100703799" width="85%" data-width="1065" data-height="328">
+<img src="https://tva3.sinaimg.cn/large/006JhGcigy1gwsaf56svbj30tl094die.jpg" alt="image-20200713100703799" width="85%">
 
 这个收集器是一个单线程的收集器，但它的“单线程”的意义并不仅仅说明它只会使用一个 CPU 或一条收集线程去完成垃圾收集工作，更重要的是在它进行垃圾收集时，必须暂停其他所有的工作线程，直到它收集结束（Stop The World）
 
@@ -218,7 +218,7 @@ ParNew 收集器除了`采用并行回收的方式执行内存回收外，两款
 
 ParNew 是很多 JVM 运行在 Server 模式下新生代的默认垃圾收集器。
 
-<img src="https://tvax1.sinaimg.cn/large/006JhGcily1gwsakpewgpj30uo08yacz.jpg" alt="image-20200713102030127" width="80%" data-width="1104" data-height="322">
+<img src="https://tvax1.sinaimg.cn/large/006JhGcily1gwsakpewgpj30uo08yacz.jpg" alt="image-20200713102030127" width="80%">
 
 - 对于新生代，回收次数频繁，使用并行方式高效。
 - 对于老年代，回收次数少，使用串行方式节省资源。（CPU 并行需要切换线程，串行可以省去切换线程的资源）
@@ -250,7 +250,7 @@ Parallel 收集器在 JDK1.6 时提供了用于执行老年代垃圾收集的 Pa
 
 Parallel old 收集器采用了`标记-压缩算法，但同样也是基于并行回收和"stop-the-World"机制`。
 
-<img src="https://tvax2.sinaimg.cn/large/006JhGcily1gwsbjgo5u9j30uv09htc0.jpg" alt="image-20200713110359441" width="80%" data-width="1111" data-height="341">
+<img src="https://tvax2.sinaimg.cn/large/006JhGcily1gwsbjgo5u9j30uv09htc0.jpg" alt="image-20200713110359441" width="80%">
 
 在程序吞吐量优先的应用场景中，Parallel 收集器和 Parallel old 收集器的组合，在 server 模式下的内存回收性能很不错。`在Java8中，默认是此垃圾收集器`。
 
@@ -300,23 +300,23 @@ CMS 的垃圾收集算法`采用标记-清除算法，并且也会"stop-the-worl
 
 在 G1 出现之前，CMS 使用还是非常广泛的。一直到今天，仍然有很多系统使用 CMS GC。
 
-<img src="https://tva2.sinaimg.cn/large/006JhGcily1gwsgz2tt8dj30th09477u.jpg" alt="image-20200713205154007" width="80%" data-width="1061" data-height="328">
+<img src="https://tva2.sinaimg.cn/large/006JhGcily1gwsgz2tt8dj30th09477u.jpg" alt="image-20200713205154007" width="80%">
 
 CMS 整个过程比之前的收集器要复杂，整个过程分为 4 个主要阶段，即初始标记阶段、并发标记阶段、重新标记阶段和并发清除阶段。`(涉及STW的阶段主要是：初始标记 和 重新标记)`
 
 - **初始标记**（Initial-Mark）阶段：在这个阶段中，程序中所有的工作线程都将会因为“stop-the-world”机制而出现短暂的暂停，这个阶段的主要任务仅仅只是**标记出 GCRoots 能直接关联到的对象**（`标记那些直接被GC root引用或者被年轻代中存活对象直接引用的所有对象`）。 一旦标记完成之后就会恢复之前被暂停的所有应用线程。由于直接关联对象比较小，所以这里的速度非常快。
 
-<img src="https://tva1.sinaimg.cn/large/006JhGcigy1gwx856nrvnj30l006mtae.jpg" alt="图片" width="85%" data-width="756" data-height="238">
+<img src="https://tva1.sinaimg.cn/large/006JhGcigy1gwx856nrvnj30l006mtae.jpg" alt="图片" width="85%">
 
 - **并发标记**（Concurrent-Mark）阶段：从 GC Roots 的直接关联对象开始遍历整个对象图的过程，这个过程耗时较长但是不需要停顿用户线程，可以与垃圾收集线程一起并发运行。由于并发执行，在标记的过程中，用户线程可能会改变一些引用。
 
-<img src="https://tva4.sinaimg.cn/large/006JhGcigy1gwx8dki8o5j30hi05e75i.jpg" alt="图片" width="85%" data-width="630" data-height="194">
+<img src="https://tva4.sinaimg.cn/large/006JhGcigy1gwx8dki8o5j30hi05e75i.jpg" alt="图片" width="85%">
 
 - **并发预清理** （Concurrent-Preclean）：这也是一个并发阶段，与应用的线程并发运行，并不会 stop 应用的线程。在并发运行的过程中，一些对象的引用可能会发生变化，但是这种情况发生时，JVM 会将包含这个对象的区域（Card）标记为 Dirty，这也就是 Card Marking。在 pre-clean 阶段，那些能够从 Dirty 对象到达的对象也会被标记，这个标记做完之后，dirty card 标记就会被清除了。
 
-<img src="https://tva4.sinaimg.cn/large/006JhGcigy1gwx8xgver6j30ii06mdin.jpg" alt="图片" width="85%" data-width="666" data-height="238">
+<img src="https://tva4.sinaimg.cn/large/006JhGcigy1gwx8xgver6j30ii06mdin.jpg" alt="图片" width="85%">
 
-<img src="https://tvax1.sinaimg.cn/large/006JhGcigy1gwx90e13i3j30iu06rju4.jpg" alt="图片" width="85%" data-width="678" data-height="243">
+<img src="https://tvax1.sinaimg.cn/large/006JhGcigy1gwx90e13i3j30iu06rju4.jpg" alt="图片" width="85%">
 
 - **可终止的预处理**（Concurrent Abortable Preclean）：这个阶段尝试着去承担下一个阶段 Final Remark 阶段足够多的工作。这个阶段持续的时间依赖好多的因素，由于这个阶段是重复的做相同的事情直到发生 abort 的条件（比如：重复的次数、多少量的工作、持续的时间等等）之一才会停止。此阶段最大持续时间为 5 秒，之所以可以持续 5 秒，另外一个原因也是为了期待这 5 秒内能够发生一次 ygc，清理年轻代的引用，使得下个阶段的重新标记阶段，扫描年轻带指向老年代的引用的时间减少；
 
@@ -332,7 +332,7 @@ CMS 整个过程比之前的收集器要复杂，整个过程分为 4 个主要�
 
 CMS 收集器的垃圾收集算法采用的是**标记清除算法**，这意味着每次执行完内存回收后，由于被执行内存回收的无用对象所占用的内存空间极有可能是不连续的一些内存块，`不可避免地将会产生一些内存碎片`。`那么CMS在为新对象分配内存空间时，将无法使用指针碰撞（Bump the Pointer）技术，而只能够选择空闲列表（Free List）执行内存分配`。
 
-<img src="https://tvax1.sinaimg.cn/large/006JhGcily1gwsh4se7slj30ly08fmzz.jpg" alt="image-20200713212230352" width="75%" data-width="790" data-height="303">
+<img src="https://tvax1.sinaimg.cn/large/006JhGcily1gwsh4se7slj30ly08fmzz.jpg" alt="image-20200713212230352" width="75%">
 
 #### 6.1 CMS 为什么不使用标记整理算法？
 
@@ -440,11 +440,11 @@ G1 收集器设计目标：
 
 G1 所谓的分代，已经不是下面这样的了
 
-<img src="https://tva3.sinaimg.cn/large/006JhGcigy1gwsjuynq51j30ot0dx79c.jpg" alt="image-20200713215105293" width="70%" data-width="893" data-height="501">
+<img src="https://tva3.sinaimg.cn/large/006JhGcigy1gwsjuynq51j30ot0dx79c.jpg" alt="image-20200713215105293" width="70%">
 
 而是这样的一个区域
 
-<img src="https://tvax2.sinaimg.cn/large/006JhGcigy1gwsjvgvdtwj30uf0a40ws.jpg" alt="image-20200713215133839" width="70%" data-width="1095" data-height="364">
+<img src="https://tvax2.sinaimg.cn/large/006JhGcigy1gwsjvgvdtwj30uf0a40ws.jpg" alt="image-20200713215133839" width="70%">
 
 heap 被划分为一个个相等的不连续的内存区域（regions），每个 region 都有一个分代的角色：eden、survivor、old。`对每个角色的数量并没有强制的限定，也就是说对每个分代内存的大小，可以动态变化`。
 
@@ -512,7 +512,7 @@ HotSpot 垃圾收集器里，除了 G1 以外，其他的垃圾收集器使用�
 
 虽然还保留有新生代和老年代的概念，但新生代和老年代不再是物理隔离的了，它们都是一部分 Region（不需要连续）的集合。通过 Region 的动态分配方式实现逻辑上的连续。
 
-<img src="https://tva3.sinaimg.cn/large/006JhGcily1gwskqll6apj30s909ujup.jpg" alt="image-20200713223244886" width="80%" data-width="1017" data-height="354">
+<img src="https://tva3.sinaimg.cn/large/006JhGcily1gwskqll6apj30s909ujup.jpg" alt="image-20200713223244886" width="80%">
 
 一个 region 有可能属于 Eden，Survivor 或者 old/Tenured 内存区域。但是一个 region 只可能属于一个角色。图中的 E 表示该 region 属于 Eden 内存区域，s 表示属于 survivor 内存区域，o 表示属于 old 内存区域。图中空白的表示未使用的内存空间。
 
@@ -522,7 +522,7 @@ G1 垃圾收集器还增加了一种新的内存区域，叫做 Humongous 内存
 
 `每个 Region 都是通过指针碰撞来分配空间`
 
-<img src="https://tvax1.sinaimg.cn/large/006JhGcily1gwskx38nkwj30uy0dymz2.jpg" alt="image-20200713223509993" width="70%" data-width="1114" data-height="502">
+<img src="https://tvax1.sinaimg.cn/large/006JhGcily1gwskx38nkwj30uy0dymz2.jpg" alt="image-20200713223509993" width="70%">
 
 #### 7.9 G1 垃圾回收器的回收过程
 
@@ -534,7 +534,7 @@ G1GC 的垃圾回收过程主要包括如下三个环节：
 
 （如果需要，单线程、独占式、高强度的 FullGC 还是继续存在的。它针对 GC 的评估失败提供了一种失败保护机制，即强力回收。）
 
-<img src="https://tvax3.sinaimg.cn/large/006JhGcigy1gwsl3spawyj30vd0b6dic.jpg" alt="image-20200713224113996" width="70%" data-width="1129" data-height="402">
+<img src="https://tvax3.sinaimg.cn/large/006JhGcigy1gwsl3spawyj30vd0b6dic.jpg" alt="image-20200713224113996" width="70%">
 
 顺时针，young gc->young gc+concurrent mark->Mixed GC 顺序，进行垃圾回收。
 
@@ -562,7 +562,7 @@ G1GC 的垃圾回收过程主要包括如下三个环节：
 
 然后检查将要写入的引用指向的对象是否和该 Reference 类型数据在不同的 Region（其他收集器：检查老年代对象是否引用了新生代对象）；如果不同，通过 cardTable 把相关引用信息记录到引用指向对象的所在 Region 对应的 Remembered Set 中；当进行垃圾收集时，在 GC 根节点的枚举范围加入 Remembered Set；就可以保证不进行全局扫描，也不会有遗漏。
 
-<img src="https://tva1.sinaimg.cn/large/006JhGcigy1gwsmjt0kgmj30vo0ajacn.jpg" alt="image-20200713224716715" width="80%" data-width="1140" data-height="379">
+<img src="https://tva1.sinaimg.cn/large/006JhGcigy1gwsmjt0kgmj30vo0ajacn.jpg" alt="image-20200713224716715" width="80%">
 
 #### 7.11 G1 回收过程-年轻代 GC
 
@@ -570,7 +570,7 @@ JVM 启动时，G1 先准备好 Eden 区，程序在运行过程中不断创建�
 
 YGC 时，首先 G1 停止应用程序的执行（Stop-The-World），G1 创建回收集（Collection Set），回收集是指需要被回收的内存分段的集合，年轻代回收过程的回收集包含年轻代 Eden 区和 Survivor 区所有的内存分段。
 
-<img src="https://tvax4.sinaimg.cn/large/006JhGcily1gwsmm6bor7j30rd0h0gtm.jpg" alt="image-20200713225100632" width="80%" data-width="985" data-height="612">
+<img src="https://tvax4.sinaimg.cn/large/006JhGcily1gwsmm6bor7j30rd0h0gtm.jpg" alt="image-20200713225100632" width="80%">
 
 然后开始如下回收过程：
 
@@ -582,7 +582,7 @@ YGC 时，首先 G1 停止应用程序的执行（Stop-The-World），G1 创建�
 
 处理 dirty card queue（见备注）中的 card，更新 RSet。此阶段完成后，RSet 可以准确的反映老年代对所在的内存分段中对象的引用。
 
-<img src="https://tva4.sinaimg.cn/large/006JhGcily1gwvrsvgiuwj30o908aafv.jpg" alt="图片" width="80%" data-width="873" data-height="298">
+<img src="https://tva4.sinaimg.cn/large/006JhGcily1gwvrsvgiuwj30o908aafv.jpg" alt="图片" width="80%">
 
 - 第三阶段，处理 RSet
 
