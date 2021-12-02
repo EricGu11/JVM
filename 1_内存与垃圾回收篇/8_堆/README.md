@@ -8,7 +8,7 @@ notebook: 宋红康-JVM
 
 堆针对一个 JVM 进程来说是唯一的，也就是一个进程只有一个 JVM，但是进程包含多个线程，他们是共享同一堆空间的。
 
-<img src=https://p.pstatp.com/origin/pgc-image/8f65a6136cd4489a97406bdba31560e7 width="70%">
+<img src="https://tva1.sinaimg.cn/large/006JhGcily1gwrf9skxbnj30t80cegp4.jpg" alt="image-20200706195127740" width="70%">
 
 一个 JVM 实例只存在一个堆内存，堆也是 Java 内存管理的核心区域。
 
@@ -26,7 +26,7 @@ notebook: 宋红康-JVM
 
 下图就是使用：Java VisualVM 查看堆空间的内容，通过 jdk bin 提供的插件
 
-<img src=https://p.pstatp.com/origin/pgc-image/71721baf098c4c2d88cadd3fe40dcf91 width="70%">
+<img src="https://tvax3.sinaimg.cn/large/006JhGcily1gwrfav9u4kj30y80heaoi.jpg" alt="image-20200706200739392" width="70%">
 
 《Java 虚拟机规范》中对 Java 堆的描述是：`所有的对象实例以及数组都应当在运行时分配在堆上`。（The heap is the run-time data area from which memory for all class instances and arrays is allocated）
 
@@ -41,7 +41,7 @@ notebook: 宋红康-JVM
 
 堆，是 GC（Garbage Collection，垃圾收集器）执行垃圾回收的重点区域。
 
-<img src=https://p.pstatp.com/origin/pgc-image/6b9c76842b3145399ac502e6be0779ed width="70%">
+<img src="https://tva3.sinaimg.cn/large/006JhGcily1gwrfgyjfxlj30lr09sjur.jpg" alt="image-20200706201904057" width="70%">
 
 ### 2. 堆内存细分
 
@@ -59,11 +59,11 @@ Java 8 及之后堆内存逻辑上分为三部分：`新生区+养老区+元空�
 
 约定：新生区 -> 新生代 -> 年轻代 、 养老区 -> 老年区 -> 老年代、 永久区 -> 永久代
 
-<img src=https://p.pstatp.com/origin/pgc-image/0b381329b8764ad3a1830343dd830596 width="80%">
+<img src="https://tvax3.sinaimg.cn/large/006JhGcigy1gwrfp8p2xij30lq0f70xd.jpg" alt="image-20200706203419496" width="80%">
 
 堆空间内部结构，JDK1.8 之前从永久代 替换成 元空间
 
-<img src=https://p.pstatp.com/origin/pgc-image/18141bd7ade64ca391c138710c947c6c width="80%">
+<img src="https://tvax2.sinaimg.cn/large/006JhGcily1gwrfqqf6w4j30t70e2adw.jpg" alt="image-20200706203835403" width="80%">
 
 ### 3. 设置堆内存大小与 OOM
 
@@ -128,19 +128,19 @@ public class HeapSpaceInitial {
 jps  ->  jstat -gc 进程id
 ```
 
-<img src=https://p.pstatp.com/origin/pgc-image/f827c30dbf0241d58daec38fcc0fad39 width="70%">
+<img src="https://tva1.sinaimg.cn/large/006JhGcily1gwrfraprxvj30x0024my0.jpg" alt="image-20200706205756045" width="70%">
 
 ```
 -XX:+PrintGCDetails
 ```
 
-<img src=https://p.pstatp.com/origin/pgc-image/d32b18ba09f44e14b4c7b30d3f26dbf7 width="70%">
+<img src="https://tva2.sinaimg.cn/large/006JhGcily1gwrfrsdzc5j311208twpu.jpg" alt="image-20200706205821919" width="70%">
 
 ### 4. OutOfMemory 举例
 
-<img src=https://p.pstatp.com/origin/pgc-image/42c4c5159a5d4ffab16721f46199198d width="60%">
+<img src="https://tva4.sinaimg.cn/large/006JhGcigy1gwrftrwa26j30q30angpx.jpg" alt="image-20200706205947535" width="60%">
 
-<img src=https://p.pstatp.com/origin/pgc-image/badc2ff51b78466fa17e8ce50539ce53 width="70%">
+<img src="https://tvax3.sinaimg.cn/large/006JhGcigy1gwrfu4sv56j30me039aca.jpg" alt="image-20200706210000461" width="70%">
 
 我们简单的写一个 OOM 例子
 
@@ -170,7 +170,7 @@ public class OOMTest {
 
 运行后，就出现 OOM 了，那么我们可以通过 VisualVM 这个工具查看具体是什么参数造成的 OOM
 
-<img src=https://p.pstatp.com/origin/pgc-image/4d53a8265cde49bcaef518e0fcab2fde width="70%">
+<img src="https://tva1.sinaimg.cn/large/006JhGcigy1gwrfuzb88bj31gg0rl4im.jpg" alt="image-20200706211652779" width="70%">
 
 ### 5. 年轻代与老年代
 
@@ -184,11 +184,11 @@ Java 堆区进一步细分的话，可以划分为年轻代（YoungGen）和老�
 
 其中年轻代又可以`划分为 Eden 空间、Survivor0 空间和 Survivor1 空间（有时也叫做 from区、to区）`
 
-<img src=https://p.pstatp.com/origin/pgc-image/d7017bfae99440e5b2f716377c1b1fa7 width="80%">
+<img src="https://tvax4.sinaimg.cn/large/006JhGcigy1gwrfvlglljj30eq086ace.jpg" alt="image-20200707075847954" width="80%">
 
 下面这参数开发中一般不会调：
 
-<img src=https://p.pstatp.com/origin/pgc-image/4929e568c7ec4f8bbeb3a1ded7a772c6 width="80%">
+<img src="https://tvax2.sinaimg.cn/large/006JhGcigy1gwrg2jaaeoj30qj05mdhg.jpg" alt="image-20200707080154039" width="80%">
 
 - Eden：From：to -> 8:1:1 (默认)
 - 新生代：老年代 - > 1:2 （默认）
@@ -203,7 +203,7 @@ Java 堆区进一步细分的话，可以划分为年轻代（YoungGen）和老�
 
 在 HotSpot 中，Eden 空间和另外两个 survivor 空间缺省所占的比例是 8：1：1 当然开发人员可以通过选项"-xx:SurvivorRatio"调整这个空间比例。比如-xx:SurvivorRatio=8
 
-<img src=https://p.pstatp.com/origin/pgc-image/91aecf535a964c8d95cd3bcfa469de07 width="50%">
+<img src="https://tva3.sinaimg.cn/large/006JhGcigy1gwrg5akk8lj30fy0av77k.jpg" alt="图片" width="50%">
 
 > 默认 Eden：From：to -> 8:1:1，但是查看实际是 6:1:1，这里存在`自适应内存分配机制`, "-XX:-UseAdaptiveSizePolicy"关闭自适应的内存分配策略。
 
@@ -215,7 +215,7 @@ Java 堆区进一步细分的话，可以划分为年轻代（YoungGen）和老�
 >
 > 这个参数一般使用默认值就可以了。
 
-<img src=https://p.pstatp.com/origin/pgc-image/475b89fd4a8640dfa60fae60ff36221d width="80%">
+<img src="https://tvax4.sinaimg.cn/large/006JhGcigy1gwrg5u8lytj30sr0ajgnx.jpg" alt="image-20200707084208115" width="80%">
 
 ### 6. 图解对象分配过程
 
@@ -238,17 +238,17 @@ Java 堆区进一步细分的话，可以划分为年轻代（YoungGen）和老�
 
 我们创建的对象，一般都是存放在 Eden 区的，当我们 Eden 区满了后，就会触发 GC 操作，一般被称为 YGC / Minor GC 操作
 
-<img src=https://p.pstatp.com/origin/pgc-image/4421a8468bf046fd91643576934f1416 width="80%">
+<img src="https://tvax2.sinaimg.cn/large/006JhGcigy1gwrg6em5foj30r509m780.jpg" alt="image-20200707084714886" width="80%">
 
 当我们进行一次垃圾收集后，红色的将会被回收，而绿色的还会被占用着，存放在 S0(Survivor From)区。同时我们给每个对象设置了一个年龄计数器，一次回收后就是 1。
 
 同时 Eden 区继续存放对象，当 Eden 区再次存满的时候，又会触发一个 MinorGC 操作，此时 GC 将会把 Eden 和 Survivor From 中的对象 进行一次收集，把存活的对象放到 Survivor To 区，同时让年龄 + 1
 
-<img src=https://p.pstatp.com/origin/pgc-image/086848108c234842acb2b32da9913431 width="80%">
+<img src="https://tvax2.sinaimg.cn/large/006JhGcily1gwrgbzhyx6j30tc0990wu.jpg" alt="image-20200707085232646" width="80%">
 
 我们继续不断的进行对象生成和垃圾回收，当 Survivor 中的对象的年龄达到 15 的时候，将会触发一次 Promotion 晋升的操作，也就是将年轻代中的对象 晋升到 老年代中
 
-<img src=https://p.pstatp.com/origin/pgc-image/a9f7c960c6d2412398a9bc9be9496b4a width="80%">
+<img src="https://tvax2.sinaimg.cn/large/006JhGcily1gwrgcetishj31100ag0z0.jpg" alt="image-20200707085737207" width="80%">
 
 #### 6.3 思考：幸存区区满了后？
 
@@ -262,7 +262,7 @@ Java 堆区进一步细分的话，可以划分为年轻代（YoungGen）和老�
 
 #### 6.4 对象分配的特殊情况
 
-<img src=https://p.pstatp.com/origin/pgc-image/f3956fd5e19e47b285735d40261599f1 width="70%">
+<img src="https://tvax1.sinaimg.cn/large/006JhGcily1gwrgcvvuq9j30jp0g7tdu.jpg" alt="image-20200707091058346" width="70%">
 
 #### 6.5 代码演示对象分配过程
 
@@ -301,7 +301,7 @@ jvisualvm
 
 然后通过执行上面代码，通过 VisualGC 进行动态化查看
 
-<img src=https://p.pstatp.com/origin/pgc-image/300e32541cf646bfb7502e0ab8d9c214 width="80%">
+<img src="https://tvax2.sinaimg.cn/large/006JhGcily1gwrgdfug2ag31hb0s5q7s.gif" alt="垃圾回收" width="80%">
 
 最终，在老年代和新生代都满了，就出现 OOM
 
@@ -360,7 +360,7 @@ Minor GC 会引发 STW，暂停其它用户的线程，等垃圾回收结束，�
 
 > STW：stop the word
 
-<img src=https://p.pstatp.com/origin/pgc-image/dbc0e0a000544288be4dfbe3dfccb2ee width="70%">
+<img src="https://tvax2.sinaimg.cn/large/006JhGcigy1gwrggd6c3wj30st0g97b8.jpg" alt="image-20200707095606813" width="70%">
 
 #### 7.2 Major GC
 
@@ -453,11 +453,11 @@ Heap
 > 新生代：有 Eden、两块大小相同的 survivor（又称为 from/to，s0/s1）构成，to 总为空。
 > 老年代：存放新生代中经历多次 GC 仍然存活的对象。
 
-<img src=https://p.pstatp.com/origin/pgc-image/aa0ec6fbc06142d4a68f975b57b84644 width="80%">
+<img src="https://tvax4.sinaimg.cn/large/006JhGcigy1gwrggx9gtej30po06wwgb.jpg" alt="image-20200707101511025" width="80%">
 
 其实不分代完全可以，分代的唯一理由就是`优化 GC 性能`。如果没有分代，那所有的对象都在一块，就如同把一个学校的人都关在一个教室。GC 的时候要找到哪些对象没用，这样就会对堆的所有区域进行扫描。而很多对象都是朝生夕死的，如果分代的话，把新创建的对象放到某一地方，当 GC 的时候先把这块存储“朝生夕死”对象的区域进行回收，这样就会腾出很大的空间出来。
 
-<img src=https://p.pstatp.com/origin/pgc-image/e5b9eac7787d4cd9800ac85e0778ef15 width="80%">
+<img src="https://tvax3.sinaimg.cn/large/006JhGcigy1gwrghb6bqcj30md07n0u7.jpg" alt="image-20200707101543871" width="70%">
 
 ### 9 内存分配策略
 
@@ -503,7 +503,7 @@ TLAB：Thread Local Allocation Buffer，也就是为每个线程单独分配了�
 
 据我所知所有 OpenJDK 衍生出来的 JVM 都提供了 TLAB 的设计。
 
-<img src=https://p.pstatp.com/origin/pgc-image/4cc1526da4e74dc8a0eef21a39039255 width="70%">
+<img src="https://tva3.sinaimg.cn/large/006JhGcigy1gwrgi2zbipj30sb0e4mzz.jpg" alt="image-20200707103547712" width="70%">
 
 尽管不是所有的对象实例都能够在 TLAB 中成功分配内存，但 JVM 确实是将 TLAB 作为内存分配的首选。
 
@@ -517,7 +517,7 @@ TLAB：Thread Local Allocation Buffer，也就是为每个线程单独分配了�
 
 对象首先是通过 TLAB 开辟空间，如果不能放入，那么需要通过 Eden 来进行分配
 
-<img src=https://p.pstatp.com/origin/pgc-image/0b07dccedcc242cc8b03a12133bfb10c width="80%">
+<img src="https://tva2.sinaimg.cn/large/006JhGcigy1gwrgiomn4tj30t40dj423.jpg" alt="image-20200707104253530" width="80%">
 
 ### 11 小结：堆空间的参数设置
 
@@ -724,8 +724,7 @@ public class StackAllocation {
 
 然后查看内存的情况，发现有大量的 User 存储在堆中
 
-<img src=https://p.pstatp.com/origin/pgc-image/3f22c5d59f1a477d9d6e46549a696d19
-width = "80%">
+<img src="https://tvax4.sinaimg.cn/large/006JhGcigy1gwrgj84jx0j31hc0fjwp4.jpg" alt="image-20200707203038615" width="80%">
 
 我们再开启逃逸分析
 
@@ -741,7 +740,7 @@ width = "80%">
 
 再看内存情况，我们发现只有很少的 User 对象，说明 User 未发生逃逸，因为它存储在栈中，随着栈的销毁而消失
 
-<img src=https://p.pstatp.com/origin/pgc-image/eb8b8b3663424c21abbcbf68ca12fd95 width="80%">
+<img src="https://tva1.sinaimg.cn/large/006JhGcigy1gwrgjnj8daj31h70ljk6e.jpg" alt="image-20200707203441718" width="80%">
 
 ### 14 同步省略
 
@@ -771,7 +770,7 @@ public void f() {
 
 我们将其转换成字节码
 
-<img src=https://p.pstatp.com/origin/pgc-image/61fa129bc70749b788be0140e410ed0a width="80%">
+<img src="https://tvax1.sinaimg.cn/large/006JhGcigy1gwrgk2ik9gj30wk0i4dqc.jpg" alt="image-20200707205634266" width="80%">
 
 ### 15 分离对象和标量替换
 

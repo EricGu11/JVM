@@ -6,7 +6,7 @@ notebook: 宋红康-JVM
 
 ### 1. 前言
 
-<img src=https://p.pstatp.com/origin/pgc-image/1dd85871d94d47e4a65c3bb1b5e9ce64 width="70%">
+<img src=https://p.pstatp.com/origin/pgc-image/1dd85871d94d47e4a65c3bb1b5e9ce64 width="70%" referrerpolicy="no-referrer">
 
 大部分 Java 开发人员，除会在项目中使用到与 Java 平台相关的各种高精尖技术，对于 Java 技术的核心 Java 虚拟机了解甚少。
 

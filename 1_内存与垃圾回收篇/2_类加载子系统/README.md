@@ -6,7 +6,7 @@ notebook: 宋红康-JVM
 
 ### 1.概述
 
-<img src=https://p.pstatp.com/origin/pgc-image/1330b7742a8c4ff092b48237fdcec1ed width="75%">
+<img src=https://gitee.com/eric-java/pic/blob/master/chapter02/image-20200705080719531.png width="75%">
 
 完整图如下
 
