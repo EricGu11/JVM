@@ -22,7 +22,7 @@ notebook: 宋红康-JVM
 
 **按线程数分**（垃圾回收线程数），可以分为`串行垃圾回收器和并行垃圾回收器`。
 
-<img src="https://tvax1.sinaimg.cn/large/006JhGcily1gwrhrwnmb4j30ha0bwdhu.jpg" alt="image-20200713083030867" width="80%">
+<img src="https://tvax1.sinaimg.cn/large/006JhGcily1gwrhrwnmb4j30ha0bwdhu.jpg" width="80%"/>
 
 串行回收指的是在同一时间段内只允许有一个 CPU 用于执行垃圾回收操作，此时工作线程被暂停，直至垃圾收集工作结束。
 
@@ -486,10 +486,14 @@ G1 的设计原则就是简化 JVM 性能调优，开发人员只需要简单的
 
 G1 中提供了三种垃圾回收模式：YoungGC、Mixed GC 和 FullGC，在不同的条件下被触发。
 
-**G1 vs CMS**
+**G1 相对于 CMS 的优势**
 
-1. 对比使用 mark-sweep 的 CMS, G1 使用 copying 算法不会造成内存碎片
-2. G1 相比 CMS，其暂停时间可以人为的控制，而 CMS 暂停时间不可控，甚至当 Concurrent Mode Failure 时会进行 Full GC，此时暂停时间会很长
+1. G1 在压缩空间方面有优势
+2. G1 通过将内存空间分成区域（Region）的方式避免内存碎片问题
+3. Eden、Survivor、Old 区不再固定，在内存使用效率上来说更灵活
+4. G1 可以通过设置预期停顿时间来控制垃圾收集时间，避免应用雪崩现象
+5. G1 在回收内存会同时做合并空闲内存的工作，而 CMS 默认是在 Full GC 的时候做
+6. G1 会在 Young GC 中使用，而 CMS 只能在 Old 区使用
 
 #### 7.7 G1 收集器的适用场景
 
@@ -536,7 +540,7 @@ G1GC 的垃圾回收过程主要包括如下三个环节：
 
 <img src="https://tvax3.sinaimg.cn/large/006JhGcigy1gwsl3spawyj30vd0b6dic.jpg" alt="image-20200713224113996" width="70%">
 
-顺时针，young gc->young gc+concurrent mark->Mixed GC 顺序，进行垃圾回收。
+顺时针，young gc->young gc+concurrent mark->mixed GC 顺序，进行垃圾回收。
 
 应用程序分配内存，当年轻代的 Eden 区用尽时开始年轻代回收过程；`G1 的年轻代收集阶段是一个并行的独占式收集器`。在年轻代回收期，G1GC 暂停所有应用程序线程，启动多线程执行年轻代回收。然后从年轻代区间移动存活对象到 Survivor 区间或者老年区间，也有可能是两个区间都会涉及。
 
@@ -564,11 +568,13 @@ G1GC 的垃圾回收过程主要包括如下三个环节：
 
 <img src="https://tva1.sinaimg.cn/large/006JhGcigy1gwsmjt0kgmj30vo0ajacn.jpg" alt="image-20200713224716715" width="80%">
 
+RSet 记录了其他 Region 中的对象引用本 Region 中对象的关系，属于 points-into 结构（谁引用了我的对象）。RSet 的价值在于使得垃圾收集器不需要扫描整个堆找到谁引用了当前分区中的对象，只需要扫描 RSet 即可。
+
 #### 7.11 G1 回收过程-年轻代 GC
 
 JVM 启动时，G1 先准备好 Eden 区，程序在运行过程中不断创建对象到 Eden 区，当 Eden 空间耗尽时，G1 会启动一次年轻代垃圾回收过程。
 
-YGC 时，首先 G1 停止应用程序的执行（Stop-The-World），G1 创建回收集（Collection Set），回收集是指需要被回收的内存分段的集合，年轻代回收过程的回收集包含年轻代 Eden 区和 Survivor 区所有的内存分段。
+YGC 时，首先 G1 停止应用程序的执行（Stop-The-World），G1 创建`回收集（Collection Set）`，回收集是指需要被回收的内存分段的集合，年轻代回收过程的回收集包含年轻代 Eden 区和 Survivor 区所有的内存分段。
 
 <img src="https://tvax4.sinaimg.cn/large/006JhGcily1gwsmm6bor7j30rd0h0gtm.jpg" alt="image-20200713225100632" width="80%">
 
@@ -601,63 +607,64 @@ YGC 时，首先 G1 停止应用程序的执行（Stop-The-World），G1 创建�
 - 初始标记阶段：标记从根节点直接可达的对象。这个阶段是 STW 的，并且会触发一次年轻代 GC。
 - 根区域扫描（Root Region Scanning）：G1 GC 扫描 survivor 区直接可达的老年代区域对象，并标记被引用的对象。这一过程必须在 youngGC 之前完成。
 - 并发标记（Concurrent Marking）：在整个堆中进行并发标记（和应用程序并发执行），此过程可能被 youngGC 中断。在并发标记阶段，若发现区域对象中的所有对象都是垃圾，那这个区域会被立即回收。同时，并发标记过程中，会计算每个区域的对象活性（区域中存活对象的比例）。
-- 再次标记（Remark）：由于应用程序持续进行，需要修正上一次的标记结果。是 STW 的。G1 中采用了比 CMS 更快的初始快照算法：snapshot-at-the-beginning（SATB）。
-- 独占清理（cleanup，STW）：计算各个区域的存活对象和 GC 回收比例，并进行排序，识别可以混合回收的区域。为下阶段做铺垫。是 sTw 的。这个阶段并不会实际上去做垃圾的收集
+- 再次标记（Remark）：由于应用程序持续进行，需要修正上一次的标记结果。是 STW 的。G1 中采用了比 CMS 更快的初始`快照算法：snapshot-at-the-beginning（SATB）`。
+- 独占清理（Cleanup，STW）：计算各个区域的存活对象和 GC 回收比例，并进行排序，识别可以混合回收的区域。为下阶段做铺垫。是 STW 的。这个阶段并不会实际上去做垃圾的收集
 - 并发清理阶段：识别并清理完全空闲的区域。
 
-### G1 回收过程 - 混合回收
+#### 7.13 G1 回收过程 - 混合回收
 
-当越来越多的对象晋升到老年代 o1d region 时，为了避免堆内存被耗尽，虚拟机会触发一个混合的垃圾收集器，即 Mixed GC，该算法并不是一个 old GC，除了回收整个 Young Region，还会回收一部分的 old Region。这里需要注意：**是一部分老年代，而不是全部老年代**。可以选择哪些 o1d Region 进行收集，从而可以对垃圾回收的耗时时间进行控制。也要注意的是 Mixed GC 并不是 Full GC。
+当越来越多的对象晋升到老年代 old region 时，为了避免堆内存被耗尽，虚拟机会触发一个混合的垃圾收集器，即 Mixed GC，该算法并不是一个 old GC，除了回收整个 Young Region，还会回收一部分的 old Region。这里需要注意：**是一部分老年代，而不是全部老年代**。可以选择哪些 old Region 进行收集，从而可以对垃圾回收的耗时时间进行控制。也要注意的是 Mixed GC 并不是 Full GC。
 
-![image-20200713225810871](images/image-20200713225810871.png)
+<img src="https://tvax3.sinaimg.cn/large/006JhGcily1gx0madt4kzj30gt0dq785.jpg" alt="image-20200713225810871" width="40%">
 
-并发标记结束以后，老年代中百分百为垃圾的内存分段被回收了，部分为垃圾的内存分段被计算了出来。默认情况下，这些老年代的内存分段会分 8 次（可以通过-XX:G1MixedGCCountTarget 设置）被回收
+并发标记结束以后，老年代中百分百为垃圾的内存分段被回收了，部分为垃圾的内存分段被计算了出来。默认情况下，这些老年代的内存分段会分 8 次（可以通过`-XX:G1MixedGCCountTarget` 设置）被回收
 
 混合回收的回收集（Collection Set）包括八分之一的老年代内存分段，Eden 区内存分段，Survivor 区内存分段。混合回收的算法和年轻代回收的算法完全一样，只是回收集多了老年代的内存分段。具体过程请参考上面的年轻代回收过程。
 
 由于老年代中的内存分段默认分 8 次回收，G1 会优先回收垃圾多的内存分段。垃圾占内存分段比例越高的，越会被先回收。并且有一个阈值会决定内存分段是否被回收，
 
-XX:G1MixedGCLiveThresholdPercent，默认为 65%，意思是垃圾占内存分段比例要达到 65%才会被回收。如果垃圾占比太低，意味着存活的对象占比高，在复制的时候会花费更多的时间。
+`XX:G1MixedGCLiveThresholdPercent`，默认为 65%，意思是垃圾占内存分段比例要达到 65%才会被回收。如果垃圾占比太低，意味着存活的对象占比高，在复制的时候会花费更多的时间。
 
-混合回收并不一定要进行 8 次。有一个阈值-XX:G1HeapWastePercent，默认值为 1e%，意思是允许整个堆内存中有 10%的空间被浪费，意味着如果发现可以回收的垃圾占堆内存的比例低于 1e%，则不再进行混合回收。因为 GC 会花费很多的时间但是回收到的内存却很少。
+混合回收并不一定要进行 8 次。有一个阈值`-XX:G1HeapWastePercent`，默认值为 10%，意思是允许整个堆内存中有 10%的空间被浪费，意味着如果发现可以回收的垃圾占堆内存的比例低于 10%，则不再进行混合回收。因为 GC 会花费很多的时间但是回收到的内存却很少。
 
-### G1 回收可选的过程 4 - Full GC
+#### 7.14 G1 回收可选的过程 4 - Full GC
 
-G1 的初衷就是要避免 Fu11GC 的出现。但是如果上述方式不能正常工作，G1 会停止应用程序的执行（stop-The-world），使用单线程的内存回收算法进行垃圾回收，性能会非常差，应用程序停顿时间会很长。
+G1 的初衷就是要避免 FullGC 的出现。但是如果上述方式不能正常工作，G1 会停止应用程序的执行（Stop-The-World），使用单线程的内存回收算法进行垃圾回收(Serial Old)，性能会非常差，应用程序停顿时间会很长。
 
-要避免 Fu11GC 的发生，一旦发生需要进行调整。什么时候会发生 Ful1GC 呢？比如堆内存太小，当 G1 在复制存活对象的时候没有空的内存分段可用，则会回退到 ful1gc，这种情况可以通过增大内存解决。
-导致 61Fu11GC 的原因可能有两个：
+要避免 Fu11GC 的发生，一旦发生需要进行调整。什么时候会发生 FullGC 呢？比如堆内存太小，当 G1 在复制存活对象的时候没有空的内存分段可用，则会回退到 FullGC，这种情况可以通过增大内存解决。
 
-- EVacuation 的时候没有足够的 to-space 来存放晋升的对象；
+导致 G1 FullGC 的原因可能有两个：
+
+- Evacuation 的时候没有足够的 to-space 来存放晋升的对象；
 - 并发处理过程完成之前空间耗尽。
 
-### G1 回收的优化建议
+#### 7.15 G1 回收的优化建议
 
 从 oracle 官方透露出来的信息可获知，回收阶段（Evacuation）其实本也有想过设计成与用户程序一起并发执行，但这件事情做起来比较复杂，考虑到 G1 只是回一部分 Region，停顿时间是用户可控制的，所以并不迫切去实现，而选择把这个特性放到了 G1 之后出现的低延迟垃圾收集器（即 ZGC）中。另外，还考虑到 G1 不是仅仅面向低延迟，停顿用户线程能够最大幅度提高垃圾收集效率，为了保证吞吐量所以才选择了完全暂停用户线程的实现方案。
 
 年轻代大小
 
-- 避免使用-Xmn 或-XX:NewRatio 等相关选项显式设置年轻代大小
+- `避免使用-Xmn 或-XX:NewRatio 等相关选项显式设置年轻代大小`
 - 固定年轻代的大小会覆盖
 
-暂停时间目标暂停时间目标不要太过严苛
+目标暂停时间目标不要太过严苛
 
 - G1 GC 的吞吐量目标是 90%的应用程序时间和 10%的垃圾回收时间
 - 评估 G1GC 的吞吐量时，暂停时间目标不要太严苛。目标太过严苛表示你愿意承受更多的垃圾回收开销，而这些会直接影响到吞吐量。
 
-## 垃圾回收器总结
+### 8 垃圾回收器总结
 
 截止 JDK1.8，一共有 7 款不同的垃圾收集器。每一款的垃圾收集器都有不同的特点，在具体使用的时候，需要根据具体的情况选用不同的垃圾收集器。
 
-![image-20200714075738203](images/image-20200714075738203.png)
+<img src="https://tva4.sinaimg.cn/large/006JhGcily1gx0mn736lej30vx08o14p.jpg" alt="image-20200714075738203" width="85%">
 
-GC 发展阶段：Seria l=> Parallel（并行）=> CMS（并发）=> G1 => ZGC
+GC 发展阶段：Serial => Parallel（并行）=> CMS（并发）=> G1 => ZGC
 
 不同厂商、不同版本的虚拟机实现差距比较大。HotSpot 虚拟机在 JDK7/8 后所有收集器及组合如下图
 
-![image-20200714080151020](images/image-20200714080151020.png)
+<img src="https://tva4.sinaimg.cn/large/006JhGcily1gx0moxlecsj30p30dh0xi.jpg" alt="image-20200714080151020" width="80%">
 
-### 怎么选择垃圾回收器
+#### 8.1 怎么选择垃圾回收器
 
 Java 垃圾收集器的配置对于 JVM 优化来说是一个很重要的选择，选择合适的垃圾收集器可以让 JVM 的性能有一个很大的提升。怎么选择垃圾收集器？
 
@@ -673,10 +680,9 @@ Java 垃圾收集器的配置对于 JVM 优化来说是一个很重要的选择�
 - 没有最好的收集器，更没有万能的收集
 - 调优永远是针对特定场景、特定需求，不存在一劳永逸的收集器
 
-### 面试
+#### 8.2 面试
 
-对于垃圾收集，面试官可以循序渐进从理论、实践各种角度深入，也未必是要求面试者什么都懂。但如果你懂得原理，一定会成为面试中的加分项。
-这里较通用、基础性的部分如下：
+对于垃圾收集，面试官可以循序渐进从理论、实践各种角度深入，也未必是要求面试者什么都懂。但如果你懂得原理，一定会成为面试中的加分项。这里较通用、基础性的部分如下：
 
 垃圾收集的算法有哪些？如何判断一个对象是否可以回收？
 
@@ -684,19 +690,19 @@ Java 垃圾收集器的配置对于 JVM 优化来说是一个很重要的选择�
 
 另外，大家需要多关注垃圾回收器这一章的各种常用的参数
 
-## GC 日志分析
+### 9 GC 日志分析
 
-通过阅读 Gc 日志，我们可以了解 Java 虚拟机内存分配与回收策略。
+通过阅读 GC 日志，我们可以了解 Java 虚拟机内存分配与回收策略。
 内存分配与垃圾回收的参数列表
 
-- -XX:+PrintGc 输出 GC 日志。类似：-verbose:gc
-- -XX:+PrintGcDetails 输出 Gc 的详细日志
-- -XX:+PrintGcTimestamps 输出 Gc 的时间戳（以基准时间的形式）
-- -XX:+PrintGCDatestamps 输出 Gc 的时间戳（以日期的形式，如 2013-05-04T21：53：59.234+0800）
-- -XX:+PrintHeapAtGC 在进行 Gc 的前后打印出堆的信息
-- -Xloggc:../logs/gc.1og 日志文件的输出路径
+- `-XX:+PrintGC` 输出 GC 日志。类似：-verbose:gc
+- `-XX:+PrintGCDetails` 输出 Gc 的详细日志
+- `-XX:+PrintGCTimeStamps` 输出 Gc 的时间戳（以基准时间的形式）
+- `-XX:+PrintGCDateStamps` 输出 Gc 的时间戳（以日期的形式，如 2013-05-04T21：53：59.234+0800）
+- `-XX:+PrintHeapAtGC` 在进行 GC 的前后打印出堆的信息
+- `-Xloggc:../logs/gc.log` 日志文件的输出路径
 
-### verbose:gc
+#### 9.1 -verbose:gc
 
 打开 GC 日志
 
@@ -706,34 +712,34 @@ Java 垃圾收集器的配置对于 JVM 优化来说是一个很重要的选择�
 
 这个只会显示总的 GC 堆的变化，如下：
 
-![image-20200714081610474](images/image-20200714081610474.png)
+<img src="https://tva3.sinaimg.cn/large/006JhGcily1gx0mzmgbivj30w802qjv8.jpg" alt="image-20200714081610474" width="85%">
 
 参数解析
 
-![image-20200714081622526](images/image-20200714081622526.png)
+<img src="https://tvax3.sinaimg.cn/large/006JhGcily1gx0n05nppdj30vd05bdka.jpg" alt="image-20200714081622526" width="85%">
 
-### PrintGCDetails
+#### 9.2 PrintGCDetails
 
 打开 GC 日志
 
 ```bash
--verbose:gc -XX:+PrintGCDetails
+-XX:+PrintGCDetails
 ```
 
 输入信息如下
 
-![image-20200714081909309](images/image-20200714081909309.png)
+<img src="https://tva3.sinaimg.cn/large/006JhGcily1gx0n1pjp2nj30w204ttfm.jpg" alt="image-20200714081909309" width="85%">
 
 参数解析
 
-![image-20200714081925767](images/image-20200714081925767.png)
+<img src="https://tvax2.sinaimg.cn/large/006JhGcily1gx0nbh2liij30w5066aib.jpg" alt="image-20200714081925767" width="85%">
 
-### 补充
+#### 9.3 补充
 
-- [GC"和"[Fu11GC"说明了这次垃圾收集的停顿类型，如果有"Fu11"则说明 GC 发生了"stop The World"
-- 使用 Seria1 收集器在新生代的名字是 Default New Generation，因此显示的是"[DefNew"
+- [GC"和"[FullGC"说明了这次垃圾收集的停顿类型，如果有"Ful"则说明 GC 发生了"stop The World"
+- 使用 Serial 收集器在新生代的名字是 Default New Generation，因此显示的是"[DefNew"
 - 使用 ParNew 收集器在新生代的名字会变成"[ParNew"，意思是"Parallel New Generation"
-- 使用 Paralle1 scavenge 收集器在新生代的名字是”[PSYoungGen"
+- 使用 Parallel scavenge 收集器在新生代的名字是”[PSYoungGen"
 - 老年代的收集和新生代道理一样，名字也是收集器决定的
 - 使用 G1 收集器的话，会显示为"garbage-first heap"
 
@@ -743,15 +749,15 @@ Allocation Failure 表明本次引起 GC 的原因是因为在年轻代中没有
 
 user 代表用户态回收耗时，sys 内核态回收耗时，rea 实际耗时。由于多核的原因，时间总和可能会超过 rea1 时间
 
-### Young GC 图片
+**Young GC 图片**
 
-![image-20200714082555688](images/image-20200714082555688.png)
+<img src="https://tva2.sinaimg.cn/large/006JhGcily1gx45gr94xxj30w60acjwk.jpg" alt="image-20200714082555688" width="85%">
 
-### FullGC 图片、
+**FullGC 图片**
 
-![image-20200714082714690](images/image-20200714082714690.png)
+<img src="https://tva2.sinaimg.cn/large/006JhGcily1gx45k225boj31a50bn45m.jpg" alt="image-20200714082714690" width="85%">
 
-### GC 回收举例
+#### 9.4 GC 回收举例
 
 我们编写一个程序，用来说明 GC 收集的过程
 
@@ -776,16 +782,16 @@ public class GCUseTest {
 我们设置 JVM 启动参数
 
 ```bash
--Xms10m -Xmx10m -XX:+PrintGCDetails
+-Xmn10m -Xms20m -Xmx20m -XX:+PrintGCDetails
 ```
 
 首先我们会将 3 个 2M 的数组存放到 Eden 区，然后后面 4M 的数组来了后，将无法存储，因为 Eden 区只剩下 2M 的剩余空间了，那么将会进行一次 Young GC 操作，将原来 Eden 区的内容，存放到 Survivor 区，但是 Survivor 区也存放不下，那么就会直接晋级存入 Old 区
 
-![image-20200714083332238](images/image-20200714083332238.png)
+<img src="https://tva2.sinaimg.cn/large/006JhGcily1gx45o8u697j30sa0bytbw.jpg" alt="image-20200714083332238" width="70%">
 
 然后我们将 4M 对象存入到 Eden 区中
 
-![image-20200714083526790](images/image-20200714083526790.png)
+<img src="https://tvax2.sinaimg.cn/large/006JhGcily1gx45prrmzaj30lq0caq5m.jpg" alt="image-20200714083526790" width="70%">
 
 可以用一些工具去分析这些 GC 日志
 
@@ -793,19 +799,19 @@ public class GCUseTest {
 
 **GCViewer**
 
-![image-20200714084921184](images/image-20200714084921184.png)
+<img src="https://tvax2.sinaimg.cn/large/006JhGcily1gx45s2zhh7j30r10f60ya.jpg" alt="image-20200714084921184" width="80%">
 
 **GC easy**
 
-![image-20200714084726824](images/image-20200714084726824.png)
+<img src="https://tva3.sinaimg.cn/large/006JhGcily1gx45rhrmlpj319o0j7wux.jpg" alt="image-20200714084726824" width="80%">
 
-## 垃圾回收器的新发展
+### 10 垃圾回收器的新发展
 
-GC 仍然处于飞速发展之中，目前的默认选项 G1GC 在不断的进行改进，很多我们原来认为的缺点，例如串行的 Fu11GC、Card Table 扫描的低效等，都已经被大幅改进，例如，JDK10 以后，Fu11GC 已经是并行运行，在很多场景下，其表现还略优于 ParallelGC 的并行 Ful1GC 实现。
+GC 仍然处于飞速发展之中，目前的默认选项 G1GC 在不断的进行改进，很多我们原来认为的缺点，例如串行的 FullGC、Card Table 扫描的低效等，都已经被大幅改进，例如，JDK10 以后，FullGC 已经是并行运行，在很多场景下，其表现还略优于 ParallelGC 的并行 FullGC 实现。
 
 即使是 SerialGC，虽然比较古老，但是简单的设计和实现未必就是过时的，它本身的开销，不管是 GC 相关数据结构的开销，还是线程的开销，都是非常小的，所以随着云计算的兴起，在 serverless 等新的应用场景下，Serial Gc 找到了新的舞台。
 
-比较不幸的是 CMSGC，因为其算法的理论缺陷等原因，虽然现在还有非常大的用户群体，但在 JDK9 中已经被标记为废弃，并在 JDK14 版本中移除
+比较不幸的是 CMS GC，因为其算法的理论缺陷等原因，虽然现在还有非常大的用户群体，但在 JDK9 中已经被标记为废弃，并在 JDK14 版本中移除
 
 Epsilon:A No-Op GarbageCollector（Epsilon 垃圾回收器，"No-Op（无操作）"回收器）http://openidk.iava.net/iep s/318
 
@@ -815,17 +821,17 @@ ZGC:A Scalable Low-Latency Garbage Collector（Experimental）（ZGC：可伸缩
 
 > 主打特点：低停顿时间
 
-### Open JDK12 的 Shenandoash GC
+#### 10.1 Open JDK12 的 Shenandoash GC
 
 Open JDK12 的 shenandoash GC：低停顿时间的 GC（实验性）
 
-Shenandoah，无疑是众多 GC 中最孤独的一个。是第一款不由 oracle 公司团队领导开发的 Hotspot 垃圾收集器。不可避免的受到官方的排挤。比如号称 openJDK 和 OracleJDk 没有区别的 Oracle 公司仍拒绝在 oracleJDK12 中支持 Shenandoah。
+Shenandoah，无疑是众多 GC 中最孤独的一个。是第一款不由 oracle 公司团队领导开发的 Hotspot 垃圾收集器。不可避免的受到官方的排挤。比如号称 openJDK 和 OracleJDk 没有区别的 Oracle 公司仍拒绝在 oracle JDK12 中支持 Shenandoah。
 
 Shenandoah 垃圾回收器最初由 RedHat 进行的一项垃圾收集器研究项目 Pauseless GC 的实现，旨在针对 JVM 上的内存回收实现低停顿的需求。在 2014 年贡献给 OpenJDK。
 
 Red Hat 研发 Shenandoah 团队对外宣称，Shenandoah 垃圾回收器的暂停时间与堆大小无关，这意味着无论将堆设置为 200MB 还是 200GB，99.9%的目标都可以把垃圾收集的停顿时间限制在十毫秒以内。不过实际使用性能将取决于实际工作堆的大小和工作负载。
 
-![image-20200714090608807](images/image-20200714090608807.png)
+<img src="https://tvax2.sinaimg.cn/large/006JhGcily1gx461ghag7j30qi07gq59.jpg" alt="image-20200714090608807" width="65%">
 
 这是 RedHat 在 2016 年发表的论文数据，测试内容是使用 Es 对 200GB 的维基百科数据进行索引。从结果看：
 
@@ -837,41 +843,40 @@ Red Hat 研发 Shenandoah 团队对外宣称，Shenandoah 垃圾回收器的暂�
 - shenandoah Gc 的弱项：高运行负担下的吞吐量下降。
 - shenandoah GC 的强项：低延迟时间。
 
-### 革命性的 ZGC
+#### 10.2 革命性的 ZGC
 
-zGC 与 shenandoah 目标高度相似，在尽可能对吞吐量影响不大的前提下，实现在任意堆内存大小下都可以把垃圾收集的停颇时间限制在十毫秒以内的低延迟。
+ZGC 与 shenandoah 目标高度相似，在尽可能对吞吐量影响不大的前提下，实现在任意堆内存大小下都可以把垃圾收集的停颇时间限制在十毫秒以内的低延迟。
 
-《深入理解 Java 虚拟机》一书中这样定义 zGC：2GC 收集器是一款基于 Region 内存布局的，（暂时）不设分代的，使用了读屏障、染色指针和内存多重映射等技术来实现可并发的标记-压缩算法的，以低延迟为首要目标的一款垃圾收集器。
+《深入理解 Java 虚拟机》一书中这样定义 ZGC：ZGC 收集器是一款基于 Region 内存布局的，（暂时）不设分代的，使用了读屏障、染色指针和内存多重映射等技术来实现可并发的标记-压缩算法的，以低延迟为首要目标的一款垃圾收集器。
 
 ZGC 的工作过程可以分为 4 个阶段：**并发标记 - 并发预备重分配 - 并发重分配 - 并发重映射** 等。
 
-ZGC 几乎在所有地方并发执行的，除了初始标记的是 STw 的。所以停顿时间几乎就耗费在初始标记上，这部分的实际时间是非常少的。
+ZGC 几乎在所有地方并发执行的，除了初始标记的是 STW 的。所以停顿时间几乎就耗费在初始标记上，这部分的实际时间是非常少的。
 
-![image-20200714091201073](images/image-20200714091201073.png)
+<img src="https://tva3.sinaimg.cn/large/006JhGcily1gx463kzgnkj30ny0erjtt.jpg" alt="image-20200714091201073" width="80%">
 
 停顿时间对比
 
-![image-20200714091401511](images/image-20200714091401511.png)
+<img src="https://tvax1.sinaimg.cn/large/006JhGcily1gx464avna2j30sc0egdj4.jpg" alt="image-20200714091401511" width="80%">
 
-虽然 ZGC 还在试验状态，没有完成所有特性，但此时性能已经相当亮眼，用“令人震惊、革命性”来形容，不为过。
-未来将在服务端、大内存、低延迟应用的首选垃圾收集器。
+虽然 ZGC 还在试验状态，没有完成所有特性，但此时性能已经相当亮眼，用“令人震惊、革命性”来形容，不为过。未来将在服务端、大内存、低延迟应用的首选垃圾收集器。
 
-![image-20200714093243028](images/image-20200714093243028.png)
+<img src="https://tva4.sinaimg.cn/large/006JhGcily1gx465isbsbj30ck0g3n0p.jpg" alt="image-20200714093243028" width="50%">
 
-JDK14 之前，2GC 仅 Linux 才支持。
+JDK14 之前，ZGC 仅 Linux 才支持。
 
-尽管许多使用 zGc 的用户都使用类 Linux 的环境，但在 Windows 和 macos 上，人们也需要 zGC 进行开发部署和测试。许多桌面应用也可以从 ZGC 中受益。因此，2GC 特性被移植到了 Windows 和 macos 上。
+尽管许多使用 ZGC 的用户都使用类 Linux 的环境，但在 Windows 和 macos 上，人们也需要 ZGC 进行开发部署和测试。许多桌面应用也可以从 ZGC 中受益。因此，ZGC 特性被移植到了 Windows 和 macos 上。
 
-现在 mac 或 Windows 上也能使用 zGC 了，示例如下：
+现在 mac 或 Windows 上也能使用 ZGC 了，示例如下：
 
 ```bash
 -XX:+UnlockExperimentalVMOptions-XX：+UseZGC
 ```
 
-### AliGC
+#### 10.3 AliGC
 
 AliGC 是阿里巴巴 JVM 团队基于 G1 算法，面向大堆（LargeHeap）应用场景。指定场景下的对比：
 
-![image-20200714093604012](images/image-20200714093604012.png)
+<img src="https://tva1.sinaimg.cn/large/006JhGcily1gx4672esloj30tm0atgo4.jpg" alt="image-20200714093604012" width="80%">
 
 当然，其它厂商也提供了各种别具一格的 GC 实现，例如比较有名的低延迟 GC Zing

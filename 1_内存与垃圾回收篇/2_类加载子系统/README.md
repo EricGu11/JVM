@@ -6,11 +6,11 @@ notebook: 宋红康-JVM
 
 ### 1.概述
 
-<img src=https://gitee.com/eric-java/pic/blob/master/chapter02/image-20200705080719531.png width="75%">
+<img src="https://tva1.sinaimg.cn/large/006JhGcily1h0124mp7n0j30im0fjq6l.jpg" alt="图片" width="75%">
 
 完整图如下
 
-<img src=https://p.pstatp.com/origin/pgc-image/fc287f672d1840f3be49a2750027a0bf width="80%">
+<img src="https://tvax3.sinaimg.cn/large/006JhGcily1h01eg3aizgj30jo0g3grc.jpg" alt="image-20200705080911284" width="80%">
 
 如果自己想手写一个 Java 虚拟机的话，主要考虑哪些结构呢？
 
@@ -25,13 +25,13 @@ ClassLoader 只负责 class 文件的加载，至于它是否可以运行，则�
 
 `加载的类信息存放于一块称为方法区的内存空间`。除了类的信息外，方法区中还会存放`运行时常量池信息，可能还包括字符串字面量和数字常量（这部分常量信息是Class文件中常量池部分的内存映射`）
 
-<img src=https://p.pstatp.com/origin/pgc-image/e6cac02a8a394f139f6a6eb4342ee30e width="75%">
+<img src="https://tva1.sinaimg.cn/large/006JhGcily1h01egmfwgcj30l807v76p.jpg" alt="image-20200705081813409" width="75%">
 
 - class file 存在于本地硬盘上，可以理解为设计师画在纸上的模板，而最终这个模板在执行的时候是要加载到 JVM 当中来根据这个文件实例化出 n 个一模一样的实例。
 - class file 加载到 JVM 中，被称为 DNA 元数据模板，放在方法区。
 - 在.class 文件->JVM->最终成为元数据模板，此过程就要一个运输工具（类装载器 Class Loader），扮演一个快递员的角色。
 
-<img src=https://p.pstatp.com/origin/pgc-image/89be9880e59e46d2a41c0269466a2f49 width="65%">
+<img src="https://tva4.sinaimg.cn/large/006JhGcily1h01epk6io2j30dh0amabb.jpg" alt="image-20200705081913538" width="65%">
 
 ### 3.类的加载过程
 
@@ -52,11 +52,11 @@ public class HelloLoader {
 
 它的加载过程是怎么样的呢?
 
-<img src=https://p.pstatp.com/origin/pgc-image/53e2d0c3f92a40da934341b85b4f3ef0 width="60%">
+<img src="https://tva1.sinaimg.cn/large/006JhGcily1h01epyiu41j30ht0dnmz2.jpg" alt="image-20200705082255746" width="60%">
 
 完整的流程图如下所示
 
-<img src=https://p.pstatp.com/origin/pgc-image/15632686b9434d55bf80f044b2f02305 width = '60%'>
+<img src="https://tvax3.sinaimg.cn/large/006JhGcily1h01eqbce5oj30mk071whq.jpg" alt="image-20200705082601441" width="60%">
 
 #### 3.1 加载阶段
 
@@ -85,17 +85,17 @@ public class HelloLoader {
 
 > 工具：Binary Viewer 查看
 
-<img src=https://p.pstatp.com/origin/pgc-image/3bd12be5c0de40078e36ef85e56d5190 width = '75%'>
+<img src="https://tva1.sinaimg.cn/large/006JhGcily1h01eqoz47rj31hk0t41kx.jpg" alt="image-20200705084038680" width="75%">
 
 如果出现不合法的字节码文件，那么将会验证不通过
 
 同时我们可以通过安装 IDEA 的插件，来查看我们的 Class 文件
 
-<img src=https://p.pstatp.com/origin/pgc-image/7558e0cbe6ea4f3ba383e1e128c2881c width="75%">
+<img src="https://tva3.sinaimg.cn/large/006JhGcily1h01er7tya5j30rq0jsaew.jpg" alt="image-20200705090237078" width="75%">
 
 安装完成后，我们编译完一个 class 文件后，点击 view 即可显示我们安装的插件来查看字节码方法了
 
-<img src=https://p.pstatp.com/origin/pgc-image/7558e0cbe6ea4f3ba383e1e128c2881c width="75%">
+<img src="https://tvax4.sinaimg.cn/large/006JhGcily1h01ertxufwj31gu0s514x.jpg" alt="image-20200705090328171" width="75%">
 
 ##### 准备 Prepare
 
@@ -252,7 +252,7 @@ JVM 支持两种类型的类加载器 。分别为引导类加载器（Bootstrap
 
 无论类加载器的类型如何划分，在程序中我们最常见的类加载器始终只有 3 个，如下所示：
 
-<img src=https://p.pstatp.com/origin/pgc-image/64bbbb12153c4de89a34b4c3cf90ef00 width="50%">
+<img src="https://tva1.sinaimg.cn/large/006JhGcily1h01esnc0ymj30le0d5jth.jpg" alt="image-20200705094149223" width="55%">
 
 `这里的四者之间是包含关系，不是上层和下层，也不是子系统的继承关系`。
 
@@ -313,7 +313,7 @@ null
 - Java 语言编写，由 sun.misc.Launcher$ExtClassLoader 实现。
 - 派生于 ClassLoader 类
 - 父类加载器为启动类加载器
-- 从 java.ext.dirs 系统属性所指定的目录中加载类库，或从 JDK 的安装目录的 jre/1ib/ext 子目录（扩展目录）下加载类库。如果用户创建的 JAR 放在此目录下，也会自动由扩展类加载器加载。
+- 从 java.ext.dirs 系统属性所指定的目录中加载类库，或从 JDK 的安装目录的 jre/lib/ext 子目录（扩展目录）下加载类库。如果用户创建的 JAR 放在此目录下，也会自动由扩展类加载器加载。
 
 ##### 应用程序类加载器（系统类加载器，AppClassLoader）
 
@@ -338,7 +338,7 @@ null
 
 - 开发人员可以通过继承抽象类 java.lang.ClassLoader 类的方式，实现自己的类加载器，以满足一些特殊的需求
 - 在 JDK1.2 之前，在自定义类加载器时，总会去继承 ClassLoader 类并重写 loadClass（）方法，从而实现自定义的类加载类，但是在 JDK1.2 之后已不再建议用户去覆盖 loadclass（）方法，而是建议把自定义的类加载逻辑写在 findclass（）方法中
-- 在编写自定义类加载器时，如果没有太过于复杂的需求，可以直接继承 URIClassLoader 类，这样就可以避免自己去编写 findclass（）方法及其获取字节码流的方式，使自定义类加载器编写更加简洁。
+- 在编写自定义类加载器时，如果没有太过于复杂的需求，可以直接继承 URLClassLoader 类，这样就可以避免自己去编写 findclass（）方法及其获取字节码流的方式，使自定义类加载器编写更加简洁。
 
 #### 4.3 查看根加载器所能加载的目录
 
@@ -383,11 +383,11 @@ null
 
 ClassLoader 类，它是一个抽象类，其后所有的类加载器都继承自 ClassLoader（不包括启动类加载器）
 
-<img src=https://p.pstatp.com/origin/pgc-image/020c140b710246e695590ec9eb77e431 width="85%">
+<img src="https://tvax1.sinaimg.cn/large/006JhGcily1h01et57879j30qm08agoh.jpg" alt="image-20200705103516138" width="85%">
 
 sun.misc.Launcher 它是一个 java 虚拟机的入口应用
 
-<img src=https://p.pstatp.com/origin/pgc-image/a5a2e045be8840858c031281f10c425f width="70%">
+<img src="https://tva1.sinaimg.cn/large/006JhGcily1h01etipar7j30hj0ee78n.jpg" alt="image-20200705103636003" width="70%">
 
 获取 ClassLoader 的途径
 
@@ -406,13 +406,13 @@ Java 虚拟机对 class 文件采用的是按需加载的方式，也就是说�
 - `如果父类加载器还存在其父类加载器，则进一步向上委托，依次递归，请求最终将到达顶层的启动类加载器`；
 - `如果父类加载器可以完成类加载任务，就成功返回，倘若父类加载器无法完成此加载任务，子加载器才会尝试自己去加载，这就是双亲委派模式`。
 
-<img src=https://p.pstatp.com/origin/pgc-image/9099326866724b51b41e5dda9a3456c8 width="80%">
+<img src="https://tva1.sinaimg.cn/large/006JhGcily1h01eu10t6cj30f10cejuy.jpg" alt="image-20200705105151258" width="80%">
 
 #### 5.2 双亲委派机制举例
 
 当我们加载 jdbc.jar 用于实现数据库连接的时候，首先我们需要知道的是 jdbc.jar 是基于 SPI 接口进行实现的，所以在加载的时候，会进行双亲委派，最终从根加载器中加载 SPI 核心类，然后在加载 SPI 接口类，接着在进行反向委派，通过线程上下文类加载器进行实现类 jdbc.jar 的加载。
 
-<img src=https://p.pstatp.com/origin/pgc-image/55f7a2dfec3e4d3f913de9b1f6c2155a width="80%">
+<img src="https://tvax3.sinaimg.cn/large/006JhGcily1h01eudqzvqj30m50e77b8.jpg" alt="image-20200705105810107" width="80%">
 
 #### 5.3 沙箱安全机制
 
